@@ -1,24 +1,21 @@
-const OpenAI = require("openai");
+const Groq = require("groq-sdk");
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ text: "Gunakan POST" });
+  if (req.method !== 'POST') return res.status(405).send("Method Not Allowed");
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Atau "gpt-4" kalau akunmu mendukung
+    const chatCompletion = await groq.chat.completions.create({
       messages: [
         { role: "system", content: "Kamu adalah Aetheris, asisten AI yang cerdas." },
         { role: "user", content: req.body.prompt }
       ],
+      model: "llama3-8b-8192",
     });
 
-    const responseText = completion.choices[0].message.content;
-    return res.status(200).json({ text: responseText });
+    return res.status(200).json({ text: chatCompletion.choices[0].message.content });
   } catch (error) {
-    return res.status(500).json({ text: "OpenAI Error: " + error.message });
+    return res.status(500).json({ text: "Groq Error: " + error.message });
   }
 };
