@@ -13,6 +13,8 @@
             --accent: #ffffff;
             --text-dim: #9ca3af;
             --border: rgba(255, 255, 255, 0.08);
+            /* Warna Gradasi Aetheris */
+            --aetheris-glow: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -35,7 +37,7 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            animation: fadeOutSplash 0.6s ease-in-out 2.2s forwards;
+            animation: fadeOutSplash 0.6s ease-in-out 2s forwards;
         }
 
         .splash-loader {
@@ -90,7 +92,8 @@
         #chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 100px 20px 140px 20px;
+            /* Padding bawah disesuaikan agar tidak menabrak bar input */
+            padding: 100px 20px 160px 20px;
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -123,6 +126,49 @@
             color: #efefef;
         }
 
+        /* =========================================
+           1. CSS INDIKATOR MENGETIK BERWARNA
+           ========================================= */
+        #typing-indicator {
+            position: fixed;
+            bottom: 100px; /* Di atas papan ketik */
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* Sembunyi secara default */
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #e5e7eb;
+            font-weight: 500;
+            z-index: 900;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            /* Warna gradasi biru-cyan */
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            /* Animasi berdenyut pelan */
+            animation: typingDotPulse 1.4s infinite ease-in-out;
+        }
+
+        /* Delay animasi untuk setiap titik agar berurutan */
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingDotPulse {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* =========================================
+           2. SISA CSS TAMPILAN (SAMA SEPERTI SEBELUMNYA)
+           ========================================= */
         /* INPUT BAR */
         .bottom-nav {
             position: fixed;
@@ -158,24 +204,9 @@
             min-height: 24px;
         }
 
-        .action-group {
-            display: flex;
-            gap: 4px;
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-dim);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
+        .action-group { display: flex; gap: 4px; }
+        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-dim); cursor: pointer; }
         .send-btn { background: white !important; color: black !important; }
-        .send-btn:hover { transform: scale(1.05); }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
@@ -201,9 +232,18 @@
         </div>
     </div>
 
+    <div id="typing-indicator">
+        <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+        <span>Aetheris is Analysing...</span>
+    </div>
+
     <div class="bottom-nav">
         <div class="input-wrapper">
-            <textarea id="user-input" placeholder="Tulis pesan..." rows="1"></textarea>
+            <textarea id="user-input" placeholder="Tulis pesan..." rows="1" autocomplete="off"></textarea>
             <div class="action-group">
                 <button class="icon-btn" onclick="startVoice()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
@@ -218,6 +258,8 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
+        /* Ambil elemen indikator mengetik */
+        const typingIndicator = document.getElementById('typing-indicator');
 
         function autoResize() {
             this.style.height = 'auto';
@@ -233,10 +275,10 @@
             userInput.value = '';
             userInput.style.height = 'auto';
 
-            const loading = document.createElement('div');
-            loading.className = 'message ai-message';
-            loading.innerText = 'Analysing...';
-            chatContainer.appendChild(loading);
+            // =========================================
+            // 5. JAVASCRIPT: TAMPILKAN INDIKATOR MENGETIK
+            // =========================================
+            typingIndicator.style.display = 'flex'; // Tampilkan indikator melayang
             scrollToBottom();
 
             try {
@@ -246,10 +288,16 @@
                     body: JSON.stringify({ prompt: text })
                 });
                 const data = await response.json();
-                chatContainer.removeChild(loading);
+
+                // =========================================
+                // 6. JAVASCRIPT: SEMBUNYIKAN INDIKATOR MENGETIK
+                // =========================================
+                typingIndicator.style.display = 'none'; // Sembunyikan setelah jawaban muncul
+
                 appendMessage(data.text, 'ai-message');
             } catch (e) {
-                chatContainer.removeChild(loading);
+                // Sembunyikan juga jika terjadi error
+                typingIndicator.style.display = 'none';
                 appendMessage("Terjadi kendala saat memproses permintaan Anda.", 'ai-message');
             }
         }
@@ -265,6 +313,9 @@
         function scrollToBottom() {
             chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
+
+        // Voice placeholder (sama seperti sebelumnya)
+        function startVoice() { alert("Fitur suara sedang dikembangkan."); }
     </script>
 </body>
-</html>
+    </html>
