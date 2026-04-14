@@ -9,12 +9,11 @@
     <style>
         :root {
             --bg-black: #08090a;
-            --card-bg: rgba(18, 19, 20, 0.8);
+            --card-bg: rgba(22, 23, 24, 0.8);
             --accent: #ffffff;
             --text-dim: #9ca3af;
             --border: rgba(255, 255, 255, 0.08);
-            /* Warna Gradasi Aetheris */
-            --aetheris-glow: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            --aetheris-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -28,7 +27,9 @@
             overflow: hidden;
         }
 
-        /* SPLASH SCREEN */
+        /* =========================================
+           1. CSS ANIMASI LOGO COLORING (SPLASH)
+           ========================================= */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -37,63 +38,84 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            animation: fadeOutSplash 0.6s ease-in-out 2s forwards;
+            /* Splash screen hilang setelah 3.5 detik */
+            animation: fadeOutSplash 0.8s ease-in-out 3.5s forwards;
         }
 
-        .splash-loader {
-            width: 35px; height: 35px;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .aetheris-logo-svg {
+            width: 100px; height: 100px;
+            /* Definisikan warna dasar garis */
+            stroke: #ffffff;
+            stroke-width: 1.5;
+            fill: none; /* Jangan isi warna, hanya garis */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.3));
+            /* Animasi coloring & pulsing */
+            animation: logoColoring 3s ease-in-out forwards;
+        }
+
+        @keyframes logoColoring {
+            0% {
+                stroke: #ffffff;
+                stroke-dasharray: 0 100;
+                filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+            }
+            30% {
+                stroke: #00d2ff; /* Mulai coloring cyan */
+                stroke-dasharray: 100 0;
+                filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.6));
+            }
+            60% {
+                stroke: #3a7bd5; /* Berubah jadi biru */
+                filter: drop-shadow(0 0 20px rgba(58, 123, 213, 0.8));
+            }
+            100% {
+                stroke: #ffffff; /* Kembali ke putih solid di akhir */
+                fill: rgba(255, 255, 255, 0.05); /* Sedikit isi warna di akhir */
+                stroke-dasharray: 100 0;
+                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            }
+        }
+
+        .splash-text {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: white;
+            opacity: 0;
+            animation: textFadeIn 1s ease-out 1.5s forwards;
+        }
+
+        @keyframes textFadeIn { to { opacity: 0.8; } }
         @keyframes fadeOutSplash { to { opacity: 0; visibility: hidden; } }
 
-        /* HEADER */
+        /* =========================================
+           2. SISA CSS TAMPILAN (SAMA SEPERTI SEBELUMNYA)
+           ========================================= */
         header {
             padding: env(safe-area-inset-top) 20px 20px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             background: rgba(8, 9, 10, 0.8);
             backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
             z-index: 100;
         }
 
-        header h1 {
-            font-size: 0.85rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
+        header h1 { font-size: 0.85rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
 
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #10b981;
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            width: 6px; height: 6px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-        }
-
-        /* CHAT AREA */
         #chat-container {
             flex: 1;
             overflow-y: auto;
-            /* Padding bawah disesuaikan agar tidak menabrak bar input */
-            padding: 100px 20px 160px 20px;
+            padding: 100px 20px 180px 20px;
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -106,6 +128,8 @@
             animation: messageFade 0.4s ease-out;
         }
 
+        .message strong { font-weight: 800; color: #ffffff; }
+
         @keyframes messageFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .user-message {
@@ -114,7 +138,7 @@
             color: black;
             padding: 12px 18px;
             border-radius: 20px 20px 4px 20px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .ai-message {
@@ -126,57 +150,47 @@
             color: #efefef;
         }
 
-        /* =========================================
-           1. CSS INDIKATOR MENGETIK BERWARNA
-           ========================================= */
         #typing-indicator {
             position: fixed;
-            bottom: 100px; /* Di atas papan ketik */
+            bottom: 105px;
             left: 50%;
             transform: translateX(-50%);
-            display: none; /* Sembunyi secara default */
+            display: none;
             align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: #e5e7eb;
-            font-weight: 500;
+            gap: 10px;
             z-index: 900;
         }
 
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
+        .typing-dots { display: flex; gap: 4px; }
         .typing-dot {
             width: 6px; height: 6px;
             border-radius: 50%;
-            /* Warna gradasi biru-cyan */
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            /* Animasi berdenyut pelan */
+            background: var(--aetheris-gradient);
             animation: typingDotPulse 1.4s infinite ease-in-out;
         }
-
-        /* Delay animasi untuk setiap titik agar berurutan */
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        .typing-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: var(--aetheris-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
         @keyframes typingDotPulse {
             0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
             40% { transform: scale(1); opacity: 1; }
         }
 
-        /* =========================================
-           2. SISA CSS TAMPILAN (SAMA SEPERTI SEBELUMNYA)
-           ========================================= */
-        /* INPUT BAR */
         .bottom-nav {
             position: fixed;
-            bottom: 25px;
-            left: 50%;
+            bottom: 25px; left: 50%;
             transform: translateX(-50%);
-            width: 92%;
-            max-width: 650px;
+            width: 92%; max-width: 650px;
             z-index: 1000;
         }
 
@@ -186,27 +200,22 @@
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 8px 10px 8px 20px;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
             box-shadow: 0 15px 45px rgba(0,0,0,0.5);
         }
 
         textarea {
             flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 0.95rem;
-            padding: 10px 0;
-            resize: none;
-            max-height: 120px;
-            min-height: 24px;
+            background: transparent; border: none;
+            color: white; outline: none;
+            font-size: 0.95rem; padding: 10px 0;
+            resize: none; max-height: 120px; min-height: 24px;
         }
 
         .action-group { display: flex; gap: 4px; }
         .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-dim); cursor: pointer; }
-        .send-btn { background: white !important; color: black !important; }
+        .send-btn { background: white !important; color: black !important; transition: 0.2s; }
+        .send-btn:active { transform: scale(0.9); }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
@@ -215,20 +224,22 @@
 <body>
 
     <div id="splash-screen">
-        <div class="splash-loader"></div>
+        <div class="splash-content">
+            <svg class="aetheris-logo-svg" viewBox="0 0 24 24">
+                <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
+            </svg>
+            <div class="splash-text">Aetheris</div>
+        </div>
     </div>
 
     <header>
         <h1>Aetheris</h1>
-        <div class="status-badge">
-            <div class="status-dot"></div>
-            System Active
-        </div>
+        <div style="font-size: 0.7rem; color: #10b981; font-weight: 800;">ONLINE</div>
     </header>
 
     <div id="chat-container">
         <div class="message ai-message">
-            Selamat datang. Saya **Aetheris**, asisten cerdas yang dirancang untuk membantu Anda. Apa yang bisa kita kerjakan bersama hari ini?
+            Selamat datang. Saya **Aetheris**. Apa yang bisa saya bantu hari ini?
         </div>
     </div>
 
@@ -238,12 +249,12 @@
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
         </div>
-        <span>Aetheris is Analysing...</span>
+        <span class="typing-text">Aetheris is Analysing</span>
     </div>
 
     <div class="bottom-nav">
         <div class="input-wrapper">
-            <textarea id="user-input" placeholder="Tulis pesan..." rows="1" autocomplete="off"></textarea>
+            <textarea id="user-input" placeholder="Tulis sesuatu..." rows="1" autocomplete="off"></textarea>
             <div class="action-group">
                 <button class="icon-btn" onclick="startVoice()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
@@ -258,7 +269,6 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        /* Ambil elemen indikator mengetik */
         const typingIndicator = document.getElementById('typing-indicator');
 
         function autoResize() {
@@ -275,10 +285,7 @@
             userInput.value = '';
             userInput.style.height = 'auto';
 
-            // =========================================
-            // 5. JAVASCRIPT: TAMPILKAN INDIKATOR MENGETIK
-            // =========================================
-            typingIndicator.style.display = 'flex'; // Tampilkan indikator melayang
+            typingIndicator.style.display = 'flex';
             scrollToBottom();
 
             try {
@@ -288,24 +295,22 @@
                     body: JSON.stringify({ prompt: text })
                 });
                 const data = await response.json();
-
-                // =========================================
-                // 6. JAVASCRIPT: SEMBUNYIKAN INDIKATOR MENGETIK
-                // =========================================
-                typingIndicator.style.display = 'none'; // Sembunyikan setelah jawaban muncul
-
+                typingIndicator.style.display = 'none';
                 appendMessage(data.text, 'ai-message');
             } catch (e) {
-                // Sembunyikan juga jika terjadi error
                 typingIndicator.style.display = 'none';
-                appendMessage("Terjadi kendala saat memproses permintaan Anda.", 'ai-message');
+                appendMessage("Terjadi kesalahan koneksi.", 'ai-message');
             }
         }
 
         function appendMessage(text, className) {
             const div = document.createElement('div');
             div.className = `message ${className}`;
-            div.innerHTML = className === 'ai-message' ? marked.parse(text) : text;
+            if (className === 'ai-message') {
+                div.innerHTML = marked.parse(text);
+            } else {
+                div.innerText = text;
+            }
             chatContainer.appendChild(div);
             scrollToBottom();
         }
@@ -313,9 +318,8 @@
         function scrollToBottom() {
             chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
-
-        // Voice placeholder (sama seperti sebelumnya)
-        function startVoice() { alert("Fitur suara sedang dikembangkan."); }
+        
+        function startVoice() { alert("Voice feature coming soon."); }
     </script>
 </body>
-    </html>
+        </html>
