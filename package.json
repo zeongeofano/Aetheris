@@ -1,4 +1,7 @@
 {
+  "name": "aetheris-ai",
+  "version": "1.1.0",
+  "type": "module",
   "dependencies": {
     "groq-sdk": "^0.3.3"
   }
