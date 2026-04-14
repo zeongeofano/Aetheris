@@ -70,6 +70,7 @@
             line-height: 1.5;
             animation: slideUp 0.3s ease-out;
             word-wrap: break-word;
+            position: relative; /* Penting untuk posisi logo */
         }
 
         @keyframes slideUp {
@@ -91,30 +92,30 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
             border-bottom-left-radius: 4px;
+            padding-right: 45px; /* Beri ruang untuk logo di kanan atas */
         }
 
-        /* Loading Bintang Gemini */
+        /* Logo Bintang Gemini (Di Dalam Bubble AI) */
+        .ai-message .gemini-star {
+            width: 22px; /* Ukuran Sedang */
+            height: 22px;
+            color: var(--primary-glow);
+            position: absolute;
+            top: 10px; /* Jarak dari atas */
+            right: 12px; /* Jarak dari kanan */
+            opacity: 0.8;
+            filter: drop-shadow(0 0 3px var(--primary-glow));
+        }
+
+        /* Loading (Sederhana di Bawah) */
         .typing-area {
             padding: 0 20px;
-            height: 30px;
-            display: none; /* Muncul saat kirim pesan */
+            height: 25px;
+            display: none;
             align-items: center;
-            gap: 8px;
-            color: var(--primary-glow);
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .gemini-star {
-            width: 18px;
-            height: 18px;
-            animation: rotate-pulse 1.5s infinite linear;
-        }
-
-        @keyframes rotate-pulse {
-            0% { transform: scale(0.8) rotate(0deg); opacity: 0.6; }
-            50% { transform: scale(1.1) rotate(90deg); opacity: 1; filter: drop-shadow(0 0 5px var(--primary-glow)); }
-            100% { transform: scale(0.8) rotate(180deg); opacity: 0.6; }
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-style: italic;
         }
 
         /* Input Bar (Sticky di Bawah) */
@@ -186,13 +187,15 @@
     </header>
 
     <div id="chat-container">
-        <div class="message ai-message">Halo Zeon! Saya Aetheris. Ada yang bisa saya bantu hari ini?</div>
+        <div class="message ai-message">
+            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
+            </svg>
+            <span>Halo Zeon! Saya Aetheris. Ada yang bisa saya bantu hari ini?</span>
+        </div>
     </div>
 
     <div class="typing-area" id="loading-indicator">
-        <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
-        </svg>
         <span>Aetheris sedang berpikir...</span>
     </div>
 
@@ -213,6 +216,13 @@
         const userInput = document.getElementById('user-input');
         const loadingIndicator = document.getElementById('loading-indicator');
 
+        // SVG Logo Bintang Gemini (Sedang)
+        const geminiStarSvg = `
+            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
+            </svg>
+        `;
+
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text) return;
@@ -221,12 +231,12 @@
             appendMessage(text, 'user-message');
             userInput.value = '';
 
-            // 2. Tampilkan indikator loading (Bintang berputar)
+            // 2. Tampilkan indikator loading sederhana
             loadingIndicator.style.display = 'flex';
             scrollToBottom();
 
             try {
-                // 3. Panggil API ke Backend Vercel
+                // 3. Panggil API
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -249,7 +259,14 @@
         function appendMessage(text, className) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${className}`;
-            msgDiv.innerText = text;
+            
+            // Jika pesan dari AI, tambahkan logo bintang di dalamnya
+            if (className === 'ai-message') {
+                msgDiv.innerHTML = geminiStarSvg + `<span>${text}</span>`;
+            } else {
+                msgDiv.innerText = text;
+            }
+
             chatContainer.appendChild(msgDiv);
             scrollToBottom();
         }
@@ -259,4 +276,4 @@
         }
     </script>
 </body>
-                    </html>
+    </html>
