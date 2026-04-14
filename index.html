@@ -2,15 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aetheris AI | Forge Future</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Aetheris AI</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
             --primary-glow: #00d2ff;
             --bg-dark: #0f172a;
-            --gemini-surface: rgba(30, 41, 59, 0.7);
-            --border: rgba(255, 255, 255, 0.1);
+            --gemini-surface: rgba(30, 41, 59, 0.75);
+            --border: rgba(255, 255, 255, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -18,7 +18,9 @@
         body {
             background-color: var(--bg-dark);
             background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            /* Fix tinggi layar untuk mobile */
             height: 100vh;
+            height: -webkit-fill-available;
             display: flex;
             flex-direction: column;
             color: white;
@@ -26,15 +28,16 @@
         }
 
         header {
-            padding: 15px;
+            padding: env(safe-area-inset-top) 15px 15px 15px;
             text-align: center;
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(20px);
             z-index: 10;
+            flex-shrink: 0;
         }
 
         header h1 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 3px;
             color: var(--primary-glow);
             font-weight: 800;
@@ -53,7 +56,7 @@
 
         /* Message Bubbles */
         .message {
-            max-width: 85%;
+            max-width: 88%;
             padding: 14px 18px;
             border-radius: 22px;
             font-size: 0.95rem;
@@ -96,10 +99,12 @@
             100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* BAR INPUT MIRIP GEMINI */
+        /* PERBAIKAN PAPAN KETIK (BOTTOM NAV) */
         .bottom-nav {
-            padding: 15px 20px 25px 20px; /* Jarak dari bawah layar */
+            padding: 10px 15px calc(15px + env(safe-area-inset-bottom)) 15px; /* Tambah jarak aman bawah */
             background: transparent;
+            flex-shrink: 0;
+            z-index: 20;
         }
 
         .input-wrapper {
@@ -108,16 +113,11 @@
             background: var(--gemini-surface);
             backdrop-filter: blur(25px);
             border: 1px solid var(--border);
-            border-radius: 32px; /* Lebih bulat khas Gemini */
-            padding: 8px 12px 8px 20px;
+            border-radius: 28px;
+            padding: 6px 8px 6px 18px;
             display: flex;
             align-items: flex-end;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: border-color 0.3s;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: rgba(0, 210, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         textarea {
@@ -127,35 +127,33 @@
             color: white;
             outline: none;
             font-size: 1rem;
-            padding: 10px 0;
+            padding: 12px 0;
             resize: none;
-            max-height: 150px;
+            max-height: 120px;
             min-height: 24px;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .action-btns {
             display: flex;
-            gap: 5px;
-            margin-bottom: 3px;
+            gap: 2px;
+            margin-bottom: 4px;
         }
 
         .icon-btn {
             background: transparent;
             border: none;
-            width: 42px; height: 42px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            color: #94a3b8;
-            transition: all 0.2s;
+            color: #cbd5e1;
         }
 
-        .icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .send-btn { color: var(--primary-glow); }
         .mic-btn.active { color: #ef4444; animation: pulse 1.5s infinite; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -170,21 +168,21 @@
     <div id="chat-container">
         <div class="message ai-message">
             <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <div style="font-size: 0.9rem;">Halo Zeon! Saya Aetheris. Apa yang ingin kamu kembangkan di Forge Future hari ini?</div>
+            <div>Halo Zeon! Saya Aetheris. Mari kita bangun sesuatu yang hebat hari ini.</div>
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="input-wrapper">
-            <textarea id="user-input" placeholder="Ketik pesan di sini..." rows="1"></textarea>
+            <textarea id="user-input" placeholder="Tanyakan sesuatu..." rows="1" autocomplete="off"></textarea>
             
             <div class="action-btns">
-                <button class="icon-btn mic-btn" id="mic-btn" onclick="startVoice()" title="Gunakan Suara">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <button class="icon-btn mic-btn" id="mic-btn" onclick="startVoice()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                 </button>
 
-                <button class="icon-btn send-btn" onclick="sendMessage()" title="Kirim">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <button class="icon-btn send-btn" onclick="sendMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </div>
@@ -195,7 +193,7 @@
         const userInput = document.getElementById('user-input');
         const micBtn = document.getElementById('mic-btn');
 
-        // Fitur Voice
+        // Voice Logic
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             const recognition = new SpeechRecognition();
@@ -235,7 +233,7 @@
 
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message ai-message';
-            loadingDiv.innerHTML = starSvg(true) + `<span>Memproses...</span>`;
+            loadingDiv.innerHTML = starSvg(true) + `<span>Berpikir...</span>`;
             chatContainer.appendChild(loadingDiv);
             scrollToBottom();
 
@@ -250,7 +248,7 @@
                 appendMessage(data.text, 'ai-message');
             } catch (error) {
                 chatContainer.removeChild(loadingDiv);
-                appendMessage("Gagal memproses pesan.", 'ai-message');
+                appendMessage("Koneksi Forge Future terputus.", 'ai-message');
             }
         }
 
@@ -271,4 +269,4 @@
         }
     </script>
 </body>
-        </html>
+                        </html>
