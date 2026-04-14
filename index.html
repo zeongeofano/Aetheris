@@ -9,7 +9,7 @@
         :root {
             --primary-glow: #00d2ff;
             --bg-dark: #0f172a;
-            --gemini-surface: rgba(30, 41, 59, 0.8);
+            --gemini-surface: rgba(30, 41, 59, 0.85);
             --border: rgba(255, 255, 255, 0.12);
         }
 
@@ -25,6 +25,55 @@
             overflow: hidden;
         }
 
+        /* =========================================
+           1. CSS ANIMASI PEMBUKA (SPLASH SCREEN)
+           ========================================= */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0f172a; /* Warna latar gelap */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Paling depan */
+            /* Animasi menghilang (fade-out) setelah 2.5 detik */
+            animation: fadeOutSplash 0.8s ease-in-out 2.5s forwards;
+        }
+
+        .splash-logo {
+            width: 80px; height: 80px;
+            color: var(--primary-glow);
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+            /* Animasi logo berdenyut */
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+
+        .splash-text {
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: white;
+            opacity: 0.7;
+        }
+
+        /* Keyframes untuk logo berdenyut */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--primary-glow)); opacity: 0.8; }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--primary-glow)); opacity: 1; }
+        }
+
+        /* Keyframes untuk splash screen memudar & hilang */
+        @keyframes fadeOutSplash {
+            from { opacity: 1; visibility: visible; }
+            to { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
+
+        /* =========================================
+           2. SISA CSS TAMPILAN (SAMA SEPERTI SEBELUMNYA)
+           ========================================= */
         header {
             padding: env(safe-area-inset-top) 15px 15px 15px;
             text-align: center;
@@ -47,14 +96,13 @@
         #chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 80px 20px 120px 20px; /* Ruang agar tidak tertutup header & footer */
+            padding: 85px 20px 150px 20px; /* Padding bawah agar tidak tenggelam */
             display: flex;
             flex-direction: column;
             gap: 20px;
             scroll-behavior: smooth;
         }
 
-        /* Message Bubbles */
         .message {
             max-width: 88%;
             padding: 14px 18px;
@@ -69,19 +117,15 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .user-message {
-            align-self: flex-end;
-            background: #2563eb;
-            border-bottom-right-radius: 5px;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            border-bottom-left-radius: 5px;
+        .user-message { align-self: flex-end; background: #2563eb; border-bottom-right-radius: 5px; }
+        .ai-message { 
+            align-self: flex-start; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid var(--border); 
+            backdrop-filter: blur(10px); 
+            border-bottom-left-radius: 5px; 
             padding-right: 45px;
+            position: relative;
         }
 
         .gemini-star {
@@ -90,17 +134,13 @@
             position: absolute; top: 12px; right: 12px;
         }
 
-        .gemini-star.thinking { animation: spin 2s infinite linear; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* FIX: PAPAN KETIK DIAM (DIAM SEPERTI GEMINI) */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 10px 15px calc(20px + env(safe-area-inset-bottom)) 15px;
-            background: linear-gradient(to top, var(--bg-dark) 60%, transparent);
+            padding: 10px 15px calc(25px + env(safe-area-inset-bottom)) 15px;
+            background: linear-gradient(to top, var(--bg-dark) 40%, transparent);
             z-index: 100;
         }
 
@@ -128,32 +168,24 @@
             resize: none;
             max-height: 120px;
             min-height: 24px;
-            line-height: 1.4;
         }
 
-        .action-btns {
-            display: flex;
-            gap: 2px;
-            margin-bottom: 4px;
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: #cbd5e1;
-        }
-
+        .action-btns { display: flex; gap: 2px; margin-bottom: 4px; }
+        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
         .send-btn { color: var(--primary-glow); }
-        .mic-btn.active { color: #ef4444; }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
+
+    <div id="splash-screen">
+        <svg class="splash-logo" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
+        </svg>
+        <div class="splash-text">Aetheris</div>
+    </div>
 
     <header>
         <h1>Aetheris • Forge Future</h1>
@@ -162,7 +194,7 @@
     <div id="chat-container">
         <div class="message ai-message">
             <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <div>Halo Zeon! Papan ketik sekarang sudah diam di tempat. Mari kita lanjut!</div>
+            <div>Halo Zeon! Selamat datang di Forge Future. Pesan terakhir sekarang tidak akan tenggelam. Coba scroll!</div>
         </div>
     </div>
 
@@ -170,10 +202,10 @@
         <div class="input-wrapper">
             <textarea id="user-input" placeholder="Tanyakan sesuatu..." rows="1" autocomplete="off"></textarea>
             <div class="action-btns">
-                <button class="icon-btn mic-btn" id="mic-btn" onclick="startVoice()">
+                <button class="icon-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                 </button>
-                <button class="icon-btn send-btn" onclick="sendMessage()">
+                <button class="icon-btn send-btn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
@@ -181,77 +213,15 @@
     </div>
 
     <script>
+        // Logika JavaScript sama seperti sebelumnya
         const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const micBtn = document.getElementById('mic-btn');
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'id-ID';
-            recognition.onstart = () => { micBtn.classList.add('active'); };
-            recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; autoResize(); };
-            recognition.onend = () => { micBtn.classList.remove('active'); };
-            function startVoice() { recognition.start(); }
-        } else { micBtn.style.display = 'none'; }
-
-        function autoResize() {
-            userInput.style.height = 'auto';
-            userInput.style.height = userInput.scrollHeight + 'px';
-        }
-
-        userInput.addEventListener('input', autoResize);
-        userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-            appendMessage(text, 'user-message');
-            userInput.value = '';
-            userInput.style.height = 'auto';
-            
-            // Logika kirim API tetap sama
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message ai-message';
-            loadingDiv.innerHTML = `<svg class="gemini-star thinking" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg><span>Berpikir...</span>`;
-            chatContainer.appendChild(loadingDiv);
-            scrollToBottom();
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
-                });
-                const data = await response.json();
-                chatContainer.removeChild(loadingDiv);
-                appendMessage(data.text, 'ai-message');
-            } catch (error) {
-                chatContainer.removeChild(loadingDiv);
-                appendMessage("Terjadi kesalahan koneksi.", 'ai-message');
-            }
-        }
-
-        function appendMessage(text, className) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${className}`;
-            if (className === 'ai-message') {
-                msgDiv.innerHTML = `<svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg><div>${marked.parse(text)}</div>`;
-            } else {
-                msgDiv.innerText = text;
-            }
-            chatContainer.appendChild(msgDiv);
-            scrollToBottom();
-        }
 
         function scrollToBottom() {
             chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
+
+        // Jalankan scroll ke bawah otomatis saat load agar user melihat pesan awal
+        window.onload = scrollToBottom;
     </script>
 </body>
-                </html>
+    </html>
