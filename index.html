@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aetheris AI | Forge Future</title>
+    <title>Aetheris AI | Intelligent Assistant</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-glow: #00d2ff;
-            --bg-dark: #0f172a;
-            --gemini-surface: rgba(30, 41, 59, 0.85);
-            --border: rgba(255, 255, 255, 0.12);
+            --bg-black: #08090a;
+            --card-bg: rgba(18, 19, 20, 0.8);
+            --accent: #ffffff;
+            --text-dim: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            background-color: var(--bg-black);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -25,121 +26,123 @@
             overflow: hidden;
         }
 
-        /* SPLASH SCREEN ANIMASI */
+        /* SPLASH SCREEN */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0f172a;
+            background-color: var(--bg-black);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            animation: fadeOutSplash 0.8s ease-in-out 2.5s forwards;
+            animation: fadeOutSplash 0.6s ease-in-out 2.2s forwards;
         }
 
-        .splash-logo {
-            width: 80px; height: 80px;
-            color: var(--primary-glow);
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 15px var(--primary-glow));
-            animation: pulseGlow 1.8s infinite ease-in-out;
+        .splash-loader {
+            width: 35px; height: 35px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeOutSplash { to { opacity: 0; visibility: hidden; } }
 
-        @keyframes fadeOutSplash {
-            from { opacity: 1; visibility: visible; }
-            to { opacity: 0; visibility: hidden; pointer-events: none; }
-        }
-
+        /* HEADER */
         header {
-            padding: env(safe-area-inset-top) 15px 15px 15px;
-            text-align: center;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            position: fixed;
-            top: 0; width: 100%;
+            padding: env(safe-area-inset-top) 20px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(8, 9, 10, 0.8);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
+            z-index: 100;
         }
 
         header h1 {
             font-size: 0.85rem;
-            letter-spacing: 3px;
-            color: var(--primary-glow);
             font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #10b981;
             text-transform: uppercase;
         }
 
+        .status-dot {
+            width: 6px; height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* CHAT AREA */
         #chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 85px 20px 160px 20px; /* Padding bawah extra agar tidak tenggelam */
+            padding: 100px 20px 140px 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
+            gap: 24px;
         }
 
         .message {
-            max-width: 88%;
-            padding: 14px 18px;
-            border-radius: 22px;
+            max-width: 85%;
             font-size: 0.95rem;
             line-height: 1.6;
-            animation: smoothAppear 0.4s ease-out forwards;
+            animation: messageFade 0.4s ease-out;
         }
 
-        @keyframes smoothAppear {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes messageFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--accent);
+            color: black;
+            padding: 12px 18px;
+            border-radius: 20px 20px 4px 20px;
+            font-weight: 500;
         }
 
-        .user-message { align-self: flex-end; background: #2563eb; border-bottom-right-radius: 5px; }
-        .ai-message { 
-            align-self: flex-start; 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid var(--border); 
-            backdrop-filter: blur(10px); 
-            border-bottom-left-radius: 5px; 
-            padding-right: 45px;
-            position: relative;
+        .ai-message {
+            align-self: flex-start;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 15px 18px;
+            border-radius: 20px 20px 20px 4px;
+            color: #efefef;
         }
 
-        .gemini-star {
-            width: 20px; height: 20px;
-            color: var(--primary-glow);
-            position: absolute; top: 12px; right: 12px;
-        }
-
-        .gemini-star.thinking { animation: spin 2s infinite linear; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
+        /* INPUT BAR */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 10px 15px calc(25px + env(safe-area-inset-bottom)) 15px;
-            background: linear-gradient(to top, var(--bg-dark) 40%, transparent);
-            z-index: 100;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 650px;
+            z-index: 1000;
         }
 
         .input-wrapper {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--gemini-surface);
+            background: rgba(28, 29, 30, 0.95);
             backdrop-filter: blur(25px);
             border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 6px 8px 6px 18px;
+            border-radius: 24px;
+            padding: 8px 10px 8px 20px;
             display: flex;
-            align-items: flex-end;
-            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.2);
+            align-items: center;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5);
         }
 
         textarea {
@@ -148,51 +151,65 @@
             border: none;
             color: white;
             outline: none;
-            font-size: 1rem;
-            padding: 12px 0;
+            font-size: 0.95rem;
+            padding: 10px 0;
             resize: none;
             max-height: 120px;
             min-height: 24px;
         }
 
-        .action-btns { display: flex; gap: 2px; margin-bottom: 4px; }
-        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #cbd5e1; cursor: pointer; }
-        .send-btn { color: var(--primary-glow); }
-        .mic-btn.active { color: #ef4444; }
+        .action-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .send-btn { background: white !important; color: black !important; }
+        .send-btn:hover { transform: scale(1.05); }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
-        #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        #chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <svg class="splash-logo" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
-        </svg>
-        <div style="letter-spacing: 4px; font-weight: 800; opacity: 0.7;">AETHERIS</div>
+        <div class="splash-loader"></div>
     </div>
 
     <header>
-        <h1>Aetheris • Forge Future</h1>
+        <h1>Aetheris</h1>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            System Active
+        </div>
     </header>
 
     <div id="chat-container">
         <div class="message ai-message">
-            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <div>Halo Zeon! Semua fitur sudah aktif. Splash screen oke, tombol oke, dan chat tidak tenggelam lagi. Ada yang ingin kamu tanyakan?</div>
+            Selamat datang. Saya **Aetheris**, asisten cerdas yang dirancang untuk membantu Anda. Apa yang bisa kita kerjakan bersama hari ini?
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="input-wrapper">
-            <textarea id="user-input" placeholder="Tulis pesan..." rows="1" autocomplete="off"></textarea>
-            <div class="action-btns">
-                <button class="icon-btn mic-btn" id="mic-btn" onclick="startVoice()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            <textarea id="user-input" placeholder="Tulis pesan..." rows="1"></textarea>
+            <div class="action-group">
+                <button class="icon-btn" onclick="startVoice()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
                 </button>
                 <button class="icon-btn send-btn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </div>
@@ -201,31 +218,12 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        const micBtn = document.getElementById('mic-btn');
-
-        // Voice Logic
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'id-ID';
-            recognition.onstart = () => micBtn.classList.add('active');
-            recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; autoResize(); };
-            recognition.onend = () => micBtn.classList.remove('active');
-            function startVoice() { recognition.start(); }
-        } else { micBtn.style.display = 'none'; }
 
         function autoResize() {
-            userInput.style.height = 'auto';
-            userInput.style.height = userInput.scrollHeight + 'px';
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
         }
-
         userInput.addEventListener('input', autoResize);
-        userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
 
         async function sendMessage() {
             const text = userInput.value.trim();
@@ -235,10 +233,10 @@
             userInput.value = '';
             userInput.style.height = 'auto';
 
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message ai-message';
-            loadingDiv.innerHTML = `<svg class="gemini-star thinking" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg><span>Berpikir...</span>`;
-            chatContainer.appendChild(loadingDiv);
+            const loading = document.createElement('div');
+            loading.className = 'message ai-message';
+            loading.innerText = 'Analysing...';
+            chatContainer.appendChild(loading);
             scrollToBottom();
 
             try {
@@ -248,31 +246,25 @@
                     body: JSON.stringify({ prompt: text })
                 });
                 const data = await response.json();
-                chatContainer.removeChild(loadingDiv);
+                chatContainer.removeChild(loading);
                 appendMessage(data.text, 'ai-message');
-            } catch (error) {
-                chatContainer.removeChild(loadingDiv);
-                appendMessage("Gagal terhubung ke Forge Future.", 'ai-message');
+            } catch (e) {
+                chatContainer.removeChild(loading);
+                appendMessage("Terjadi kendala saat memproses permintaan Anda.", 'ai-message');
             }
         }
 
         function appendMessage(text, className) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${className}`;
-            if (className === 'ai-message') {
-                msgDiv.innerHTML = `<svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg><div>${marked.parse(text)}</div>`;
-            } else {
-                msgDiv.innerText = text;
-            }
-            chatContainer.appendChild(msgDiv);
+            const div = document.createElement('div');
+            div.className = `message ${className}`;
+            div.innerHTML = className === 'ai-message' ? marked.parse(text) : text;
+            chatContainer.appendChild(div);
             scrollToBottom();
         }
 
         function scrollToBottom() {
             chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
-
-        window.onload = scrollToBottom;
     </script>
 </body>
-                        </html>
+</html>
