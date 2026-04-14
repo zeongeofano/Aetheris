@@ -1,25 +1,14 @@
-const Groq = require("groq-sdk");
+// ... kode bagian atas tetap sama ...
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).send("Method Not Allowed");
-
-  try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         { 
           role: "system", 
-          content: "Kamu adalah Aetheris, asisten AI cerdas untuk Forge Future. Kamu ahli dalam teknologi, desain modern, dan analisis pasar." 
+          content: "Kamu adalah Aetheris, asisten AI yang cerdas, ramah, dan autentik. Gaya bicaramu mirip dengan Gemini: membantu, kreatif, dan mampu menjelaskan hal sulit dengan sederhana. Kamu mendukung penuh kreativitas pengguna dan selalu siap membantu dalam tugas apa pun, mulai dari coding, diskusi kreatif, hingga bantuan harian." 
         },
         { role: "user", content: req.body.prompt }
       ],
-      // GANTI BAGIAN INI:
       model: "llama-3.1-8b-instant",
     });
 
-    return res.status(200).json({ text: chatCompletion.choices[0].message.content });
-  } catch (error) {
-    return res.status(500).json({ text: "Groq Error: " + error.message });
-  }
-};
+// ... kode bagian bawah tetap sama ...
