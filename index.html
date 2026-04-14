@@ -55,18 +55,9 @@
             scroll-behavior: smooth;
         }
 
-        /* ANIMASI SMOOTH APPEAR */
         @keyframes smoothAppear {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-                filter: blur(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
+            from { opacity: 0; transform: translateY(20px) scale(0.95); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
         .message {
@@ -84,7 +75,6 @@
             align-self: flex-end;
             background: linear-gradient(135deg, var(--secondary-glow), #00d2ff);
             border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
         }
 
         .ai-message {
@@ -103,10 +93,7 @@
         }
 
         .gemini-star.thinking { animation: spin-glow 1.5s infinite linear; }
-        @keyframes spin-glow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin-glow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .bottom-nav {
             padding: 15px;
@@ -136,17 +123,25 @@
             min-height: 24px;
         }
 
-        button {
-            background: var(--primary-glow);
+        .icon-btn {
+            background: transparent;
             border: none;
             width: 40px; height: 40px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; margin-left: 8px;
-            transition: transform 0.2s;
+            cursor: pointer; margin-left: 5px;
+            transition: all 0.2s;
+            color: white;
         }
 
-        button:active { transform: scale(0.9); }
+        .send-btn { background: var(--primary-glow); color: black; }
+        .mic-btn.active { color: #ff4b2b; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -161,15 +156,20 @@
     <div id="chat-container">
         <div class="message ai-message">
             <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <span>Halo Zeon! Semua sistem sudah diperbarui. Ada yang ingin kamu diskusikan?</span>
+            <span>Halo Zeon! Fitur suara sudah aktif. Tekan mikrofon untuk bicara!</span>
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="input-box">
             <textarea id="user-input" placeholder="Tulis pesan..." rows="1" autocomplete="off"></textarea>
-            <button onclick="sendMessage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            
+            <button class="icon-btn mic-btn" id="mic-btn" onclick="startVoice()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+
+            <button class="icon-btn send-btn" onclick="sendMessage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
     </div>
@@ -177,6 +177,37 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
+        const micBtn = document.getElementById('mic-btn');
+
+        // FUNGSI SUARA (Voice to Text)
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'id-ID'; // Bahasa Indonesia
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                micBtn.classList.add('active');
+                userInput.placeholder = "Mendengarkan...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                userInput.value = transcript;
+                userInput.style.height = (userInput.scrollHeight) + 'px';
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove('active');
+                userInput.placeholder = "Tulis pesan...";
+            };
+
+            function startVoice() {
+                recognition.start();
+            }
+        } else {
+            document.getElementById('mic-btn').style.display = 'none';
+        }
 
         // Auto-resize textarea
         userInput.addEventListener('input', function() {
@@ -231,23 +262,18 @@
         function appendMessage(text, className) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${className}`;
-            
             if (className === 'ai-message') {
                 msgDiv.innerHTML = starSvg(false) + `<div>${marked.parse(text)}</div>`;
             } else {
                 msgDiv.innerText = text;
             }
-            
             chatContainer.appendChild(msgDiv);
             scrollToBottom();
         }
 
         function scrollToBottom() {
-            chatContainer.scrollTo({
-                top: chatContainer.scrollHeight,
-                behavior: 'smooth'
-            });
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
         }
     </script>
 </body>
-    </html>
+</html>
