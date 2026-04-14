@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aetheris AI</title>
+    <title>Aetheris AI | Forge Future</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
             --primary-glow: #00d2ff;
@@ -13,12 +14,7 @@
             --border: rgba(255, 255, 255, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
         body {
             background-color: var(--bg-dark);
@@ -40,13 +36,12 @@
         }
 
         header h1 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             letter-spacing: 2px;
             background: linear-gradient(to right, var(--primary-glow), var(--secondary-glow));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
-            text-transform: uppercase;
         }
 
         #chat-container {
@@ -55,29 +50,30 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
+        /* Bubble Chat Style */
         .message {
             max-width: 85%;
             padding: 12px 18px;
             border-radius: 20px;
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 1.6;
             position: relative;
             animation: slideUp 0.3s ease-out;
-            word-wrap: break-word;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* Styling teks di dalam Markdown */
+        .message p { margin-bottom: 8px; }
+        .message ul, .message ol { margin-left: 20px; margin-bottom: 8px; }
+        .message code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .user-message {
             align-self: flex-end;
             background: linear-gradient(135deg, var(--secondary-glow), #00d2ff);
-            color: white;
             border-bottom-right-radius: 4px;
         }
 
@@ -87,69 +83,55 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
             border-bottom-left-radius: 4px;
-            padding-right: 45px; /* Ruang untuk logo */
+            padding-right: 40px;
         }
 
-        /* Logo Bintang Gemini */
         .gemini-star {
-            width: 22px;
-            height: 22px;
+            width: 20px; height: 20px;
             color: var(--primary-glow);
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            opacity: 0.8;
-            filter: drop-shadow(0 0 3px var(--primary-glow));
+            position: absolute; top: 12px; right: 12px;
         }
 
-        /* Animasi memutar saat berpikir */
-        .gemini-star.thinking {
-            animation: spin-glow 1.5s infinite linear;
-        }
+        .gemini-star.thinking { animation: spin 1.5s infinite linear; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        @keyframes spin-glow {
-            from { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); filter: drop-shadow(0 0 8px var(--primary-glow)); }
-            to { transform: rotate(360deg) scale(1); }
-        }
-
+        /* Input Area Modern */
         .bottom-nav {
             padding: 15px;
             background: linear-gradient(transparent, var(--bg-dark) 40%);
-            border-top: 1px solid var(--border);
         }
 
         .input-box {
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Supaya tombol kirim tetap di bawah saat input meninggi */
             background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 6px 6px 6px 20px;
+            border-radius: 24px;
+            padding: 8px 8px 8px 18px;
             backdrop-filter: blur(20px);
         }
 
-        input {
+        /* Textarea agar bisa auto-resize */
+        textarea {
             flex: 1;
             background: transparent;
             border: none;
             color: white;
             outline: none;
             font-size: 1rem;
-            padding: 10px 0;
+            padding: 8px 0;
+            resize: none;
+            max-height: 150px;
+            min-height: 24px;
         }
 
         button {
             background: var(--primary-glow);
-            color: #000;
             border: none;
-            width: 42px;
-            height: 42px;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; margin-left: 8px;
         }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
@@ -159,21 +141,21 @@
 <body>
 
     <header>
-        <h1>Aetheris AI</h1>
+        <h1>AETHERIS • FORGE FUTURE</h1>
     </header>
 
     <div id="chat-container">
         <div class="message ai-message">
             <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <span>Halo Zeon! Saya Aetheris. Ada yang bisa saya bantu hari ini?</span>
+            <span>Halo Zeon! Saya Aetheris. Ada yang bisa kita bangun hari ini?</span>
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Tanyakan sesuatu..." autocomplete="off" onkeypress="if(event.key === 'Enter') sendMessage()">
+            <textarea id="user-input" placeholder="Tulis pesan..." rows="1" autocomplete="off"></textarea>
             <button onclick="sendMessage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
     </div>
@@ -181,6 +163,20 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
+
+        // Fungsi Auto-Resize Textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Kirim pakai Enter (tapi Shift+Enter buat baris baru)
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
         const starSvg = (isThinking) => `
             <svg class="gemini-star ${isThinking ? 'thinking' : ''}" viewBox="0 0 24 24" fill="currentColor">
@@ -192,14 +188,13 @@
             const text = userInput.value.trim();
             if (!text) return;
 
-            // Tampilkan pesan user
             appendMessage(text, 'user-message');
             userInput.value = '';
+            userInput.style.height = 'auto'; // Reset tinggi box
 
-            // Tampilkan bubble loading dengan bintang memutar
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message ai-message';
-            loadingDiv.innerHTML = starSvg(true) + `<span>Aetheris sedang berpikir...</span>`;
+            loadingDiv.innerHTML = starSvg(true) + `<span>Aetheris sedang memproses...</span>`;
             chatContainer.appendChild(loadingDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -211,26 +206,28 @@
                 });
                 const data = await response.json();
 
-                // Ganti loading dengan jawaban asli (bintang diam)
                 chatContainer.removeChild(loadingDiv);
                 appendMessage(data.text, 'ai-message');
             } catch (error) {
                 chatContainer.removeChild(loadingDiv);
-                appendMessage("Maaf, ada kendala koneksi.", 'ai-message');
+                appendMessage("Gagal terhubung ke Forge Future. Coba lagi.", 'ai-message');
             }
         }
 
         function appendMessage(text, className) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${className}`;
+            
             if (className === 'ai-message') {
-                msgDiv.innerHTML = starSvg(false) + `<span>${text}</span>`;
+                // Menggunakan marked.parse agar teks rapi (Markdown)
+                msgDiv.innerHTML = starSvg(false) + `<div>${marked.parse(text)}</div>`;
             } else {
                 msgDiv.innerText = text;
             }
+            
             chatContainer.appendChild(msgDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     </script>
 </body>
-</html>
+    </html>
