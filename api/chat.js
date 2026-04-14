@@ -1,29 +1,24 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 module.exports = async (req, res) => {
-  // Set header agar tidak error CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  
-  if (req.method !== 'POST') return res.status(405).json({ text: "Method Not Allowed" });
-
-  const apiKey = process.env.GEMINI_API_KEY;
-  const genAI = new GoogleGenerativeAI(apiKey);
+  if (req.method !== 'POST') return res.status(405).json({ text: "Gunakan POST" });
 
   try {
-    // Kita panggil model dengan teks lengkap, kadang ini membantu di server US
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-    
-    const chat = model.startChat({
-      history: [],
-      generationConfig: { maxOutputTokens: 500 },
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // Atau "gpt-4" kalau akunmu mendukung
+      messages: [
+        { role: "system", content: "Kamu adalah Aetheris, asisten AI yang cerdas." },
+        { role: "user", content: req.body.prompt }
+      ],
     });
 
-    const result = await chat.sendMessage(req.body.prompt || "Halo");
-    const response = await result.response;
-    
-    return res.status(200).json({ text: response.text() });
+    const responseText = completion.choices[0].message.content;
+    return res.status(200).json({ text: responseText });
   } catch (error) {
-    // Jika masih gagal, kita coba model paling dasar sebagai cadangan terakhir
-    return res.status(500).json({ text: "Sistem sibuk, coba lagi: " + error.message });
+    return res.status(500).json({ text: "OpenAI Error: " + error.message });
   }
 };
