@@ -14,7 +14,7 @@
             --border: rgba(255, 255, 255, 0.15);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
 
         body {
             background-color: var(--bg-dark);
@@ -42,6 +42,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
+            text-transform: uppercase;
         }
 
         #chat-container {
@@ -51,9 +52,23 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            scroll-behavior: smooth;
         }
 
-        /* Bubble Chat Style */
+        /* ANIMASI SMOOTH APPEAR */
+        @keyframes smoothAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
         .message {
             max-width: 85%;
             padding: 12px 18px;
@@ -61,20 +76,15 @@
             font-size: 0.95rem;
             line-height: 1.6;
             position: relative;
-            animation: slideUp 0.3s ease-out;
+            animation: smoothAppear 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            word-wrap: break-word;
         }
-
-        /* Styling teks di dalam Markdown */
-        .message p { margin-bottom: 8px; }
-        .message ul, .message ol { margin-left: 20px; margin-bottom: 8px; }
-        .message code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .user-message {
             align-self: flex-end;
             background: linear-gradient(135deg, var(--secondary-glow), #00d2ff);
             border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
         }
 
         .ai-message {
@@ -83,19 +93,21 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
             border-bottom-left-radius: 4px;
-            padding-right: 40px;
+            padding-right: 45px;
         }
 
         .gemini-star {
-            width: 20px; height: 20px;
+            width: 22px; height: 22px;
             color: var(--primary-glow);
             position: absolute; top: 12px; right: 12px;
         }
 
-        .gemini-star.thinking { animation: spin 1.5s infinite linear; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .gemini-star.thinking { animation: spin-glow 1.5s infinite linear; }
+        @keyframes spin-glow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-        /* Input Area Modern */
         .bottom-nav {
             padding: 15px;
             background: linear-gradient(transparent, var(--bg-dark) 40%);
@@ -103,7 +115,7 @@
 
         .input-box {
             display: flex;
-            align-items: flex-end; /* Supaya tombol kirim tetap di bawah saat input meninggi */
+            align-items: flex-end;
             background: var(--glass);
             border: 1px solid var(--border);
             border-radius: 24px;
@@ -111,7 +123,6 @@
             backdrop-filter: blur(20px);
         }
 
-        /* Textarea agar bisa auto-resize */
         textarea {
             flex: 1;
             background: transparent;
@@ -132,7 +143,10 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; margin-left: 8px;
+            transition: transform 0.2s;
         }
+
+        button:active { transform: scale(0.9); }
 
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -141,13 +155,13 @@
 <body>
 
     <header>
-        <h1>AETHERIS • FORGE FUTURE</h1>
+        <h1>Aetheris • Forge Future</h1>
     </header>
 
     <div id="chat-container">
         <div class="message ai-message">
             <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
-            <span>Halo Zeon! Saya Aetheris. Ada yang bisa kita bangun hari ini?</span>
+            <span>Halo Zeon! Semua sistem sudah diperbarui. Ada yang ingin kamu diskusikan?</span>
         </div>
     </div>
 
@@ -164,13 +178,13 @@
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
 
-        // Fungsi Auto-Resize Textarea
+        // Auto-resize textarea
         userInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // Kirim pakai Enter (tapi Shift+Enter buat baris baru)
+        // Enter to send
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -190,13 +204,13 @@
 
             appendMessage(text, 'user-message');
             userInput.value = '';
-            userInput.style.height = 'auto'; // Reset tinggi box
+            userInput.style.height = 'auto';
 
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message ai-message';
             loadingDiv.innerHTML = starSvg(true) + `<span>Aetheris sedang memproses...</span>`;
             chatContainer.appendChild(loadingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom();
 
             try {
                 const response = await fetch('/api/chat', {
@@ -210,7 +224,7 @@
                 appendMessage(data.text, 'ai-message');
             } catch (error) {
                 chatContainer.removeChild(loadingDiv);
-                appendMessage("Gagal terhubung ke Forge Future. Coba lagi.", 'ai-message');
+                appendMessage("Gagal terhubung. Coba lagi.", 'ai-message');
             }
         }
 
@@ -219,14 +233,20 @@
             msgDiv.className = `message ${className}`;
             
             if (className === 'ai-message') {
-                // Menggunakan marked.parse agar teks rapi (Markdown)
                 msgDiv.innerHTML = starSvg(false) + `<div>${marked.parse(text)}</div>`;
             } else {
                 msgDiv.innerText = text;
             }
             
             chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     </script>
 </body>
