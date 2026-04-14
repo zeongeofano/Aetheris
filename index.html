@@ -30,7 +30,6 @@
             overflow: hidden;
         }
 
-        /* Header Premium */
         header {
             padding: 15px;
             text-align: center;
@@ -50,7 +49,6 @@
             text-transform: uppercase;
         }
 
-        /* Area Chat (Scrollable) */
         #chat-container {
             flex: 1;
             overflow-y: auto;
@@ -58,19 +56,17 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 20px;
         }
 
-        /* Bubble Chat */
         .message {
             max-width: 85%;
             padding: 12px 18px;
             border-radius: 20px;
             font-size: 0.95rem;
             line-height: 1.5;
+            position: relative;
             animation: slideUp 0.3s ease-out;
             word-wrap: break-word;
-            position: relative; /* Penting untuk posisi logo */
         }
 
         @keyframes slideUp {
@@ -83,7 +79,6 @@
             background: linear-gradient(135deg, var(--secondary-glow), #00d2ff);
             color: white;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
         }
 
         .ai-message {
@@ -92,33 +87,32 @@
             border: 1px solid var(--border);
             backdrop-filter: blur(10px);
             border-bottom-left-radius: 4px;
-            padding-right: 45px; /* Beri ruang untuk logo di kanan atas */
+            padding-right: 45px; /* Ruang untuk logo */
         }
 
-        /* Logo Bintang Gemini (Di Dalam Bubble AI) */
-        .ai-message .gemini-star {
-            width: 22px; /* Ukuran Sedang */
+        /* Logo Bintang Gemini */
+        .gemini-star {
+            width: 22px;
             height: 22px;
             color: var(--primary-glow);
             position: absolute;
-            top: 10px; /* Jarak dari atas */
-            right: 12px; /* Jarak dari kanan */
+            top: 10px;
+            right: 12px;
             opacity: 0.8;
             filter: drop-shadow(0 0 3px var(--primary-glow));
         }
 
-        /* Loading (Sederhana di Bawah) */
-        .typing-area {
-            padding: 0 20px;
-            height: 25px;
-            display: none;
-            align-items: center;
-            color: #94a3b8;
-            font-size: 0.8rem;
-            font-style: italic;
+        /* Animasi memutar saat berpikir */
+        .gemini-star.thinking {
+            animation: spin-glow 1.5s infinite linear;
         }
 
-        /* Input Bar (Sticky di Bawah) */
+        @keyframes spin-glow {
+            from { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); filter: drop-shadow(0 0 8px var(--primary-glow)); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
         .bottom-nav {
             padding: 15px;
             background: linear-gradient(transparent, var(--bg-dark) 40%);
@@ -133,13 +127,6 @@
             border-radius: 30px;
             padding: 6px 6px 6px 20px;
             backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-        }
-
-        .input-box:focus-within {
-            border-color: var(--primary-glow);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
         }
 
         input {
@@ -163,21 +150,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        button:active {
-            transform: scale(0.9);
-        }
-
-        /* Scrollbar Halus */
-        #chat-container::-webkit-scrollbar {
-            width: 4px;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
+        #chat-container::-webkit-scrollbar { width: 4px; }
+        #chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -188,25 +164,16 @@
 
     <div id="chat-container">
         <div class="message ai-message">
-            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
-            </svg>
+            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" /></svg>
             <span>Halo Zeon! Saya Aetheris. Ada yang bisa saya bantu hari ini?</span>
         </div>
-    </div>
-
-    <div class="typing-area" id="loading-indicator">
-        <span>Aetheris sedang berpikir...</span>
     </div>
 
     <div class="bottom-nav">
         <div class="input-box">
             <input type="text" id="user-input" placeholder="Tanyakan sesuatu..." autocomplete="off" onkeypress="if(event.key === 'Enter') sendMessage()">
             <button onclick="sendMessage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
     </div>
@@ -214,11 +181,9 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        const loadingIndicator = document.getElementById('loading-indicator');
 
-        // SVG Logo Bintang Gemini (Sedang)
-        const geminiStarSvg = `
-            <svg class="gemini-star" viewBox="0 0 24 24" fill="currentColor">
+        const starSvg = (isThinking) => `
+            <svg class="gemini-star ${isThinking ? 'thinking' : ''}" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L14.85 8.65L21.5 11.5L14.85 14.35L12 21L9.15 14.35L2.5 11.5L9.15 8.65L12 2Z" />
             </svg>
         `;
@@ -227,53 +192,45 @@
             const text = userInput.value.trim();
             if (!text) return;
 
-            // 1. Tampilkan pesan user
+            // Tampilkan pesan user
             appendMessage(text, 'user-message');
             userInput.value = '';
 
-            // 2. Tampilkan indikator loading sederhana
-            loadingIndicator.style.display = 'flex';
-            scrollToBottom();
+            // Tampilkan bubble loading dengan bintang memutar
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai-message';
+            loadingDiv.innerHTML = starSvg(true) + `<span>Aetheris sedang berpikir...</span>`;
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
             try {
-                // 3. Panggil API
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: text })
                 });
-
                 const data = await response.json();
 
-                // 4. Tampilkan balasan AI
+                // Ganti loading dengan jawaban asli (bintang diam)
+                chatContainer.removeChild(loadingDiv);
                 appendMessage(data.text, 'ai-message');
             } catch (error) {
-                appendMessage("Maaf, sepertinya ada gangguan koneksi. Coba lagi ya!", 'ai-message');
-            } finally {
-                // 5. Sembunyikan loading
-                loadingIndicator.style.display = 'none';
-                scrollToBottom();
+                chatContainer.removeChild(loadingDiv);
+                appendMessage("Maaf, ada kendala koneksi.", 'ai-message');
             }
         }
 
         function appendMessage(text, className) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${className}`;
-            
-            // Jika pesan dari AI, tambahkan logo bintang di dalamnya
             if (className === 'ai-message') {
-                msgDiv.innerHTML = geminiStarSvg + `<span>${text}</span>`;
+                msgDiv.innerHTML = starSvg(false) + `<span>${text}</span>`;
             } else {
                 msgDiv.innerText = text;
             }
-
             chatContainer.appendChild(msgDiv);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     </script>
 </body>
-    </html>
+</html>
