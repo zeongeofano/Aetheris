@@ -1,27 +1,24 @@
 @import "tailwindcss";
 
 @layer base {
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    color: white;
-    overflow: hidden; /* Mencegah double scroll */
+  body {
+    @apply bg-[#0e0e0e] text-[#e3e3e3];
   }
 }
 
 @layer components {
-  /* Scrollbar lebih tipis agar tidak mengganggu pandangan */
-  ::-webkit-scrollbar {
-    width: 4px;
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
   }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.05);
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  
+  /* Styling Markdown agar rapi */
+  .prose p { @apply mb-4 last:mb-0; }
+  .prose strong { @apply text-blue-400 font-bold; }
+  .prose ul { @apply list-disc ml-5 mb-4; }
+  .prose ol { @apply list-decimal ml-5 mb-4; }
+  .prose pre { @apply bg-black/50 p-4 rounded-xl border border-white/10 overflow-x-auto my-4; }
 }
