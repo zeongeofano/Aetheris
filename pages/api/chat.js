@@ -3,31 +3,23 @@ import { getGroqResponse } from "../../lib/groq";
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   
-  // Ambil API Key dari environment
-  const apiKey = process.env.GROQ_API_KEY;
+  // Ambil pesan dan "mode" dari frontend
+  const { messages, mode } = req.body; 
 
-  if (!apiKey) {
-    return res.status(200).json({ text: "Error: API Key tidak ditemukan di sistem Vercel." });
-  }
+  // Instruksi rahasia untuk AI sesuai pilihanmu
+  const systemPrompt = mode === 'bestie' 
+    ? "Kamu adalah Aetheris Bestie. Jadilah teman curhat yang sangat hangat, santai, dan penuh empati. Gunakan bahasa aku-kamu yang luwes seperti sahabat sendiri. Jangan kaku, jangan pakai list nomor kecuali diminta." 
+    : "Kamu adalah Aetheris Pro. Jadilah asisten cerdas yang ahli teknologi dan analisis. Berikan jawaban yang profesional, padat, dan teknis. Gunakan format yang rapi.";
 
   try {
-    const { messages } = req.body;
-    
-    // Konversi role agar sesuai standar Groq
-    const cleanMessages = messages.map(m => ({
-      role: m.role === "assistant" ? "assistant" : "user",
-      content: String(m.content)
-    }));
+    const fullMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages
+    ];
 
-    const completion = await getGroqResponse(cleanMessages);
-    
-    if (completion.choices && completion.choices.length > 0) {
-      res.status(200).json({ text: completion.choices[0].message.content });
-    } else {
-      res.status(200).json({ text: "Sistem Groq tidak memberikan respon." });
-    }
+    const completion = await getGroqResponse(fullMessages);
+    res.status(200).json({ text: completion.choices[0].message.content });
   } catch (error) {
-    console.error(error);
-    res.status(200).json({ text: `Gagal konek: ${error.message}` });
+    res.status(500).json({ text: "Aduh, otak aku lagi panas. Coba tanya lagi ya!" });
   }
     }
