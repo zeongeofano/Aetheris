@@ -1,5 +1,5 @@
 {
-  "name": "znfx-ai-app",
+  "name": "aetheris-ai",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,16 +9,15 @@
   },
   "dependencies": {
     "next": "14.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "groq-sdk": "latest",
     "framer-motion": "latest",
     "lucide-react": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest",
-    "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest",
-    "autoprefixer": "latest",
-    "postcss": "latest"
+    "react-markdown": "latest",
+    "remark-gfm": "latest",
+    "tailwindcss": "3.4.1",
+    "postcss": "8.4.38",
+    "autoprefixer": "10.4.19"
   }
 }
